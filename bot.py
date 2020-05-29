@@ -12,6 +12,11 @@ client = commands.Bot(command_prefix=".")
 async def on_ready():
     print("Bot is ready")
 
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error,commands.CommandNotFound):
+        await ctx.send('Invalid command.')
+
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
     responses = ["It is certain.", "It is decidedly so.",
@@ -55,5 +60,7 @@ async def clear(ctx, amount=6):
 @client.command()
 async def kick(ctx, member: discord.Member, *, reason=None):
     await member.kick(reason=reason)
+
+
 
 client.run(token)
