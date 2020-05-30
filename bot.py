@@ -1,60 +1,65 @@
 import discord
 import random
+import youtube_dl
 import json
 from discord.ext import commands
+from youtube_dl import YoutubeDL
 import os
 
 token = os.getenv('Token')
 
-def get_prefix(client,message):
-    with open('prefixes.json','r') as f:
-        prefixes=json.load(f)
-    
+players={}
+
+def get_prefix(client, message):
+    with open('prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+
     return prefixes[str(message.guild.id)]
 
+
 client = commands.Bot(command_prefix=get_prefix)
+
 
 @client.event
 async def on_ready():
     print("Bot is ready")
 
+
 @client.event
 async def on_guild_join(guild):
-    with open('prefixes.json','r') as f:
-        prefixes=json.load(f)
+    with open('prefixes.json', 'r') as f:
+        prefixes = json.load(f)
 
     prefixes[str(guild.id)] = '.'
 
-    with open('prefixes.json','w') as f:
-        json.dump(prefixes,f,indent=4)
+    with open('prefixes.json', 'w') as f:
+        json.dump(prefixes, f, indent=4)
+
 
 @client.event
 async def on_guild_remove(guild):
-    with open ('prefixes.json','r') as f:
-        prefixes=json.load(f)
+    with open('prefixes.json', 'r') as f:
+        prefixes = json.load(f)
 
     prefixes.pop(str(guild.id))
 
-    with open('prefixes.json','w') as f:
-        json.dump(prefixes,f,indent=4)
+    with open('prefixes.json', 'w') as f:
+        json.dump(prefixes, f, indent=4)
+
 
 @client.command()
 async def changeprefix(ctx, prefix):
-    with open('prefixes.json','r') as f:
-        prefixes=json.load(f)
+    with open('prefixes.json', 'r') as f:
+        prefixes = json.load(f)
         print(prefixes)
 
     prefixes[str(ctx.guild.id)] = prefix
 
-    with open('prefixes.json','w') as f:
+    with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
 
     await ctx.send(f'Prefix changed to {prefix}')
 
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error,commands.CommandNotFound):
-        await ctx.send('Invalid command.')
 
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
@@ -76,9 +81,19 @@ async def _8ball(ctx, *, question):
                  "Very doubtful."]
     await ctx.send(f'Question:{question}\n Answer:{random.choice(responses)}')
 
+
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send('Invalid command.')
+
+
 @client.event
 async def on_member_join(member):
     print(f"{member} has landed like a bawse")
+    for channel in member.guild.channels:
+        if str(channel) == "general":
+            await channel.send_message(f"""Welcome to the server {member.mention}""")
 
 
 @client.event
@@ -101,6 +116,18 @@ async def clear(ctx, amount=6):
 async def kick(ctx, member: discord.Member, *, reason=None):
     await member.kick(reason=reason)
 
+@client.command(pass_context=True)
+async def join(ctx):
+    if ctx.message.author.voice:
+        channel = ctx.message.author.voice.channel
+        await channel.connect()
+
+@client.command(pass_context=True)
+async def leave(ctx):
+    if ctx.message.author.voice:
+        channel = ctx.message.author.voice.channel
+        server = ctx.message.guild.voice_client
+        await server.disconnect()
 
 
 client.run(token)
