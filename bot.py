@@ -77,7 +77,7 @@ class Music(commands.Cog):
 
     @commands.command()
     async def play(self, ctx, *, url):
-        """Plays from a url (almost anything youtube_dl supports)"""
+        """Plays from a url or keyword"""
 
         player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
         ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
@@ -91,11 +91,13 @@ class Music(commands.Cog):
 
     @commands.command(aliases=['PAUSE'])
     async def pause(self,ctx):
+        """Pauses the song playing"""
         ctx.voice_client.pause()
         await ctx.send("Song paused.")
 
     @commands.command(aliases=['RESUME','continue','CONTINUE'])
     async def resume(self,ctx):
+        """Resumes a paused song"""
         ctx.voice_client.resume()
         await ctx.send("Song resumed.")
 
@@ -156,6 +158,7 @@ async def on_guild_remove(guild):
 
 @client.command()
 async def changeprefix(ctx, prefix):
+    """Changes the prefix for instructions"""
     with open("prefixes.json", "r") as f:
         prefixes = json.load(f)
         print(prefixes)
@@ -170,6 +173,7 @@ async def changeprefix(ctx, prefix):
 
 @client.command(aliases=["8ball"])
 async def _8ball(ctx, *, question):
+    """Gives a random answer for a yes/no question"""
     responses = [
         "It is certain.",
         "It is decidedly so.",
@@ -216,17 +220,20 @@ async def on_member_remove(member):
 
 @client.command()
 async def ping(ctx):
+    """Displays Zeal's Ping"""
     await ctx.send(f"Pong! {round(client.latency *1000)}ms")
 
 
 @client.command()
 async def clear(ctx, amount=6):
+    """Clears the last 5 messages"""
     await ctx.channel.purge(limit=amount)
 
 
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def kick(ctx, member: discord.Member, *, reason=None):
+    """Kicks user from server(operable with permsissions)"""
     await member.kick(reason=reason)
 
 
