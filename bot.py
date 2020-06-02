@@ -1,6 +1,7 @@
 import discord
 import random
 import youtube_dl
+import asyncio
 import json
 from discord.ext import commands
 from youtube_dl import YoutubeDL
@@ -80,14 +81,39 @@ class Music(commands.Cog):
 
         player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
         ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+        embed=discord.Embed(
+            title="Now playing:",
+            description=f"{player.title}",
+            color=discord.Colour.dark_gold()
+        )
 
-        await ctx.send('Now playing: {}'.format(player.title))
+        await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(aliases=['PAUSE'])
+    async def pause(self,ctx):
+        ctx.voice_client.pause()
+        await ctx.send("Song paused.")
+
+    @commands.command(aliases=['RESUME','continue','CONTINUE'])
+    async def resume(self,ctx):
+        ctx.voice_client.resume()
+        await ctx.send("Song resumed.")
+
+    @commands.command(aliases=["stop","disconnect","bye"])
     async def leave(self, ctx):
         """Stops and disconnects the bot from voice"""
 
         await ctx.voice_client.disconnect()
+
+    @commands.command()
+    async def volume(self, ctx, volume: int):
+        """Changes the player's volume"""
+
+        if ctx.voice_client is None:
+            return await ctx.send("Not connected to a voice channel.")
+
+        ctx.voice_client.source.volume = volume / 100
+        await ctx.send("Changed volume to {}%".format(volume))
 
     @play.before_invoke
     async def ensure_voice(self, ctx):
