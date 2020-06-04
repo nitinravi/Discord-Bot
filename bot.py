@@ -5,7 +5,7 @@ import asyncio
 import json
 from discord.ext import commands
 from youtube_dl import YoutubeDL
-from zomato_service import city_id
+from zomato_service import top_rest
 import os
 
 token = os.getenv('Token')
@@ -159,10 +159,15 @@ async def on_guild_remove(guild):
         json.dump(prefixes, f, indent=4)
 
 
-@client.command(aliases=["cityid"])
-async def city_name(ctx, city):
-    cityid = city_id(city)
-    await ctx.send(cityid)
+@client.command(aliases=["top_restaurant"])
+async def food(ctx, city):
+    url = top_rest(city)
+    embed = discord.Embed(
+        title="Top restaurent near you:",
+        description=f"{url}",
+        color=discord.Colour.dark_gold()
+    )
+    await ctx.send(embed=embed)
 
 
 @client.command()
