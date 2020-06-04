@@ -5,6 +5,7 @@ import asyncio
 import json
 from discord.ext import commands
 from youtube_dl import YoutubeDL
+from zomato_service import city_id
 import os
 
 token = os.getenv('Token')
@@ -80,8 +81,9 @@ class Music(commands.Cog):
         """Plays from a url or keyword"""
 
         player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-        ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-        embed=discord.Embed(
+        ctx.voice_client.play(player, after=lambda e: print(
+            'Player error: %s' % e) if e else None)
+        embed = discord.Embed(
             title="Now playing:",
             description=f"{player.title}",
             color=discord.Colour.dark_gold()
@@ -90,18 +92,18 @@ class Music(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['PAUSE'])
-    async def pause(self,ctx):
+    async def pause(self, ctx):
         """Pauses the song playing"""
         ctx.voice_client.pause()
         await ctx.send("Song paused.")
 
-    @commands.command(aliases=['RESUME','continue','CONTINUE'])
-    async def resume(self,ctx):
+    @commands.command(aliases=['RESUME', 'continue', 'CONTINUE'])
+    async def resume(self, ctx):
         """Resumes a paused song"""
         ctx.voice_client.resume()
         await ctx.send("Song resumed.")
 
-    @commands.command(aliases=["stop","disconnect","bye"])
+    @commands.command(aliases=["stop", "disconnect", "bye"])
     async def leave(self, ctx):
         """Stops and disconnects the bot from voice"""
 
@@ -124,7 +126,8 @@ class Music(commands.Cog):
                 await ctx.author.voice.channel.connect()
             else:
                 await ctx.send("You are not connected to a voice channel.")
-                raise commands.CommandError("Author not connected to a voice channel.")
+                raise commands.CommandError(
+                    "Author not connected to a voice channel.")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
 
@@ -154,6 +157,12 @@ async def on_guild_remove(guild):
 
     with open("prefixes.json", "w") as f:
         json.dump(prefixes, f, indent=4)
+
+
+@client.command(aliases=["cityid"])
+async def city_name(ctx, city):
+    cityid = city_id(city)
+    await ctx.send(cityid)
 
 
 @client.command()
