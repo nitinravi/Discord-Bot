@@ -21,19 +21,24 @@ def city_id(city):
     return str(data["location_suggestions"][0]["id"])
 
 
-def top_rest(city):
+def top_rest(city, count):
     payload = ''
     headers = {
         'user-key': key,
     }
     entity_id = city_id(city)
     link = "/api/v2.1/search?entity_id="
-    rest = link + entity_id + "&entity_type=city&count=5"
+    rest = link + entity_id + "&entity_type=city&count=" + count
     conn.request("GET", rest, payload, headers)
     res = conn.getresponse()
     data = res.read()
     data = json.loads(data.decode("utf-8"))
-    return (data["restaurants"][0]["restaurant"]["name"]),\
-        (data["restaurants"][0]["restaurant"]["cuisines"]), \
-        (data["restaurants"][0]["restaurant"]["timings"]), \
-        (data["restaurants"][0]["restaurant"]["url"])
+    l = data["restaurants"]
+    list_r = []
+    for i in l:
+        dict_r = {"Name":(i["restaurant"]["name"]) ,\
+        "Cuisines":(i["restaurant"]["cuisines"]) , \
+        "Timings":(i["restaurant"]["timings"]) , \
+        "url":(i["restaurant"]["url"])}
+        list_r.append(dict_r)
+    return list_r
