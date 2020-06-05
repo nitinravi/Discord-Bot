@@ -161,10 +161,11 @@ async def on_guild_remove(guild):
 
 @client.command(aliases=["top_restaurant"])
 async def food(ctx, city):
-    url = top_rest(city)
+    
+    name, cuisines, timings, url = top_rest(city)
     embed = discord.Embed(
-        title="Top restaurent near you:",
-        description=f"{url}",
+        title="Top restaurents near you:",
+        description=f"Name : {name}\n Cusisines : {cuisines}\n Timings : {timings}\n Link : {url}",
         color=discord.Colour.dark_gold()
     )
     await ctx.send(embed=embed)
