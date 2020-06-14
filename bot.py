@@ -168,9 +168,21 @@ async def food(ctx, params):
     else:
         count = '1'
     data = top_rest(city, count)
+    names = ""
+    for j in range(0, int(count)):
+        name = (data[j]["Name"])
+        cuisines = (data[j]["Cuisines"])
+        timings = (data[j]["Timings"])
+        url = (data[j]["url"])
+        names = names + f"{j+1}:" + "\n" + \
+            f"Name:{name}" + "\n" + \
+                f"Cuisines:{cuisines}" + "\n" + \
+                    f"Timings:{timings}" + "\n" + \
+                        f"url:{url}" + "\n"
+        j = j+1
     embed = discord.Embed(
         title="Top restaurents near you:",
-        description=f"{data}",
+        description=f"{names}",
         color=discord.Colour.dark_gold()
     )
     await ctx.send(embed=embed)
