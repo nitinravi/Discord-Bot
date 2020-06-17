@@ -1,5 +1,0 @@
-discord
-random
-youtube_dl
-asyncio
-json
