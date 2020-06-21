@@ -10,5 +10,6 @@ client = commands.Bot(command_prefix=".")
 async def foo(ctx, params):
     await ctx.send(f"lorem ipsum")
 
+assert 1 == 2
 
 client.run(token)
