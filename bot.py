@@ -75,6 +75,7 @@ class Music(commands.Cog):
             return await ctx.voice_client.move_to(channel)
 
         await channel.connect()
+    
 
     @commands.command()
     async def play(self, ctx, *, url):
