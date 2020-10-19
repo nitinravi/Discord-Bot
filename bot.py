@@ -107,8 +107,8 @@ class Music(commands.Cog):
     @commands.command(aliases=["stop", "disconnect", "bye"])
     async def leave(self, ctx):
         """Stops and disconnects the bot from voice"""
-
-        await ctx.voice_client.disconnect()
+        ctx.voice_client.disconnect()
+        await ctx.send("Tata Bye Bye!")
 
     @commands.command()
     async def volume(self, ctx, volume: int):
@@ -232,6 +232,10 @@ async def _8ball(ctx, *, question):
     ]
     await ctx.send(f"Question:{question}\n Answer:{random.choice(responses)}")
 
+@client.command(aliases=["creator","god"])
+async def who(ctx):
+    """Try it out to check who created zeal"""
+    await ctx.send("Zeal discord bot was created by Nitin Ravi")
 
 @client.event
 async def on_command_error(ctx, error):
@@ -259,6 +263,7 @@ async def ping(ctx):
 
 
 @client.command()
+@commands.has_permissions(manage_messages=True)
 async def clear(ctx, amount=6):
     """Clears the last 5 messages"""
     await ctx.channel.purge(limit=amount)
