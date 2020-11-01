@@ -15,9 +15,9 @@ Click on the following link and enjoy Zeal on your own server - https://discord.
 
 ## Tools used for developement
 
--Accuweather api
 - VScode as an IDE
 - Postman for API testing
+- Accuweather api
 - Discord, of course
 
 ## Contact Details
