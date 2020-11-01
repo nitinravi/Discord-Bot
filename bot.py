@@ -1,134 +1,63 @@
 import discord
 import random
-import youtube_dl
-import asyncio
 import json
 from discord.ext import commands
-from youtube_dl import YoutubeDL
 from zomato_service import top_rest
+from accuweather import weatherinfo
 import os
+from discord.utils import get
 
 token = os.getenv('Token')
 
-ytdl_format_options = {
-    "format": "bestaudio/best",
-    "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
-    "restrictfilenames": True,
-    "noplaylist": True,
-    "nocheckcertificate": True,
-    "ignoreerrors": False,
-    "logtostderr": False,
-    "quiet": True,
-    "no_warnings": True,
-    "default_search": "auto",
-    "source_address": "0.0.0.0",  # bind to ipv4 as ipv6 addresses can cause issues
-}
-
-ffmpeg_options = {
-    'options': '-vn'
-}
-
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-
-
-class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
-        super().__init__(source, volume)
-
-        self.data = data
-
-        self.title = data.get('title')
-        self.url = data.get('url')
-
-    @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries'][0]
-
-        filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-
-
 client = commands.Bot(command_prefix=".")
-
-
-class Music(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.command()
-    async def join(self, ctx, *, channel: discord.VoiceChannel):
-        """Joins a voice channel"""
-
-        if ctx.voice_client is not None:
-            return await ctx.voice_client.move_to(channel)
-
-        await channel.connect()
-    
-
-    @commands.command()
-    async def play(self, ctx, *, url):
-        """Plays from a url or keyword"""
-
-        player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-        ctx.voice_client.play(player, after=lambda e: print(
-            'Player error: %s' % e) if e else None)
-        embed = discord.Embed(
-            title="Now playing:",
-            description=f"{player.title}",
-            color=discord.Colour.dark_gold()
-        )
-
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['PAUSE'])
-    async def pause(self, ctx):
-        """Pauses the song playing"""
-        ctx.voice_client.pause()
-        await ctx.send("Song paused.")
-
-    @commands.command(aliases=['RESUME', 'continue', 'CONTINUE'])
-    async def resume(self, ctx):
-        """Resumes a paused song"""
-        ctx.voice_client.resume()
-        await ctx.send("Song resumed.")
-
-    @commands.command(aliases=["stop", "disconnect", "bye"])
-    async def leave(self, ctx):
-        """Stops and disconnects the bot from voice"""
-        ctx.voice_client.disconnect()
-        await ctx.send("Tata Bye Bye!")
-
-    @commands.command()
-    async def volume(self, ctx, volume: int):
-        """Changes the player's volume"""
-
-        if ctx.voice_client is None:
-            return await ctx.send("Not connected to a voice channel.")
-
-        ctx.voice_client.source.volume = volume / 100
-        await ctx.send("Changed volume to {}%".format(volume))
-
-    @play.before_invoke
-    async def ensure_voice(self, ctx):
-        if ctx.voice_client is None:
-            if ctx.author.voice:
-                await ctx.author.voice.channel.connect()
-            else:
-                await ctx.send("You are not connected to a voice channel.")
-                raise commands.CommandError(
-                    "Author not connected to a voice channel.")
-        elif ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
-
 
 @client.event
 async def on_ready():
     print("Bot is ready")
+
+@client.command()
+async def weather(ctx, city):
+    data = weatherinfo(city)
+    text = (data["Headline"]["Text"])
+    date = (data["DailyForecasts"][0]["Date"])
+
+    if (data["DailyForecasts"][0]["Day"]["HasPrecipitation"]) == True:
+
+        dayprecep_type = (data["DailyForecasts"][0]
+                          ["Day"]["PrecipitationType"])
+        dayprecep_int = (data["DailyForecasts"][0]["Day"]
+                         ["PrecipitationIntensity"])
+
+        if dayprecep_int == "Heavy":
+            suggestion = "Stay indoors \n Store essentials \n Make sure to turn your sprinklers off"
+            emoji = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/237/cloud-with-rain_1f327.png"
+
+        elif dayprecep_int == "Moderate":
+            suggestion = "Its safe to head out \n Make sure to cover/protect yourself"
+            emoji = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/237/umbrella_2602.png"
+
+        elif dayprecep_int == "Light":
+            suggestion = "Its a pleasant day \n Enjoy your day"
+            emoji = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/sun-behind-cloud_26c5.png"
+
+    else:
+        dayprecep_type = "NA"
+        dayprecep_int = "NA"
+        suggestion = "Enjoy your clear day"
+        emoji = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/black-sun-with-rays_2600.png"
+
+    embed = discord.Embed(
+        title=f"Weather Report in {city}:",
+        description=f"{text}",
+        color=discord.Color.dark_gold()
+    )
+    embed.set_thumbnail(url=emoji)
+    embed.add_field(name="Date:", value=f"{date}")
+    embed.add_field(name="Day Precepitation:",
+                    value=f"{dayprecep_type} \n {dayprecep_int}", inline=False)
+    embed.add_field(name="Suggestion:", value=f"{suggestion}", inline=False)
+
+    await ctx.send(embed=embed)
 
 
 @client.command(aliases=["top_restaurant"])
@@ -231,6 +160,4 @@ async def kick(ctx, member: discord.Member, *, reason=None):
     """Kicks user from server(operable with permsissions)"""
     await member.kick(reason=reason)
 
-
-client.add_cog(Music(client))
 client.run(token)
