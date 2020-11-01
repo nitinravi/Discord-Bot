@@ -17,6 +17,7 @@ async def on_ready():
 
 @client.command()
 async def weather(ctx, city):
+    """Gives weather report of your city (eg: .weather coimbatore)"""
     data = weatherinfo(city)
     text = (data["Headline"]["Text"])
     date = (data["DailyForecasts"][0]["Date"])
