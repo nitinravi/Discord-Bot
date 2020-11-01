@@ -53,14 +53,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
 
-def get_prefix(_, message):
-    with open("prefixes.json", "r") as f:
-        prefixes = json.load(f)
-
-    return prefixes[str(message.guild.id)]
-
-
-client = commands.Bot(command_prefix=get_prefix)
+client = commands.Bot(command_prefix=".")
 
 
 class Music(commands.Cog):
@@ -136,28 +129,6 @@ class Music(commands.Cog):
 @client.event
 async def on_ready():
     print("Bot is ready")
-
-
-@client.event
-async def on_guild_join(guild):
-    with open("prefixes.json", "r") as f:
-        prefixes = json.load(f)
-
-    prefixes[str(guild.id)] = "."
-
-    with open("prefixes.json", "w") as f:
-        json.dump(prefixes, f, indent=4)
-
-
-@client.event
-async def on_guild_remove(guild):
-    with open("prefixes.json", "r") as f:
-        prefixes = json.load(f)
-
-    prefixes.pop(str(guild.id))
-
-    with open("prefixes.json", "w") as f:
-        json.dump(prefixes, f, indent=4)
 
 
 @client.command(aliases=["top_restaurant"])
