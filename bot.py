@@ -190,21 +190,6 @@ async def food(ctx, params):
     await ctx.send(embed=embed)
 
 
-@client.command()
-async def changeprefix(ctx, prefix):
-    """Changes the prefix for instructions"""
-    with open("prefixes.json", "r") as f:
-        prefixes = json.load(f)
-        print(prefixes)
-
-    prefixes[str(ctx.guild.id)] = prefix
-
-    with open("prefixes.json", "w") as f:
-        json.dump(prefixes, f, indent=4)
-
-    await ctx.send(f"Prefix changed to {prefix}")
-
-
 @client.command(aliases=["8ball"])
 async def _8ball(ctx, *, question):
     """Gives a random answer for a yes/no question"""
