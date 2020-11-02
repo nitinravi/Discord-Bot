@@ -9,7 +9,7 @@ from discord.utils import get
 
 token = os.getenv('Token')
 
-client = commands.Bot(command_prefix=".")
+client = commands.Bot(command_prefix=commands.when_mentioned_or("."))
 
 @client.event
 async def on_ready():
