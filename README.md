@@ -1,5 +1,5 @@
 # Zeal-Discord-Bot
-A multipurpose Discord Bot coded in Python using the discord.py library that performs multiple advanced functions from playing a song off Youtube to providing Gamers with restaurant information based on their location.
+A multipurpose Discord Bot coded in Python using the discord.py library that performs multiple advanced functions from providing weather reports to fetching restaurant information based on their location.
 
 ## Zomato API
 The fact that Discord is a platform mainly for the gaming community where esports is practiced with passion, makes it clear that a lot of the users are people that may keep travelling around the world to new places for tournaments, event tours, etc.
@@ -17,6 +17,7 @@ Click on the following link and enjoy Zeal on your own server - https://discord.
 
 - VScode as an IDE
 - Postman for API testing
+- Accuweather api
 - Discord, of course
 
 ## Contact Details
