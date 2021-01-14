@@ -60,7 +60,7 @@ async def weather(ctx, city):
     )
     embed.set_thumbnail(url=emoji)
     embed.add_field(name="Date:", value=f"{date}")
-    embed.add_field(name="Day Precepitation:",
+    embed.add_field(name="Day Precipitation:",
                     value=f"{dayprecep_type} \n {dayprecep_int}", inline=False)
     embed.add_field(name="Suggestion:", value=f"{suggestion}", inline=False)
 
@@ -90,7 +90,7 @@ async def food(ctx, params):
             f"url : {url}" + "\n"
         j = j+1
     embed = discord.Embed(
-        title="Top restaurents near you:",
+        title="Top restaurants near you:",
         description=f"{names}",
         color=discord.Colour.dark_gold()
     )
@@ -164,7 +164,7 @@ async def clear(ctx, amount=6):
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def kick(ctx, member: discord.Member, *, reason=None):
-    """Kicks user from server(operable with permsissions)"""
+    """Kicks user from server(operable with permissions)"""
     await member.kick(reason=reason)
 
 client.run(token)
