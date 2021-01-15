@@ -103,6 +103,7 @@ async def _8ball(ctx, *, question):
     responses = [
         "It is certain.",
         "It is decidedly so.",
+        "LOL",
         "Without a doubt.",
         "Yes - definitely.",
         "You may rely on it.",
